@@ -1,1 +1,1 @@
-# Automated-Student-ID-Card-Photo-Approval-System-Using-Convolutional-Neural-Networks-CNN-
+# Automated Student ID Card Photo Approval System Using Convolutional Neural Networks
