@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 24px;
+        }
+        #loading-animation {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="overlay">
+        <div id="loading-animation"></div>
+        <div id="result-message"></div>
+    </div>
+    <form id="verification-form" enctype="multipart/form-data">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br>
+    </br></br>
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob" name="dob" required><br>
+    </br></br>
+        <label for="department">Department:</label>
+        <input type="text" id="department" name="department" required><br>
+    </br></br>
+        <label for="regNumber">Register Number:</label>
+        <input type="text" id="regNumber" name="regNumber" required><br>
+    </br></br>
+        <label for="batch">Batch:</label>
+        <input type="text" id="batch" name="batch" required><br>
+    </br></br>
+        <label for="photo">Photo:</label>
+        <input type="file" id="photo" name="photo" accept="image/*" required onchange="processPhoto()"><br>
+    </br></br>
+        <span id="message"></span>
+    </br></br>
+        <input type="submit" value="Submit" id="submit-button" disabled>
+    </form>
+
+    <script>
+        function showOverlay() {
+            document.getElementById("overlay").style.display = "flex";
+            document.getElementById("loading-animation").style.display = "block";
+            document.getElementById("result-message").innerText = "";
+        }
+
+        function hideOverlay() {
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("loading-animation").style.display = "none";
+        }
+
+        function processPhoto() {
+            showOverlay();
+
+            var form = document.getElementById("verification-form");
+            var formData = new FormData(form);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideOverlay();
+
+                if (data.result === 1) {
+                    document.getElementById("result-message").innerText = "Photo accepted!";
+                    document.getElementById("message").innerText = "Photo Accepted. Please Submit."; // Clear any previous error message
+                    document.getElementById("submit-button").disabled = false;
+                } else {
+                    document.getElementById("result-message").innerText = "Photo rejected. Please reupload.";
+                    document.getElementById("message").innerText = "Photo Not Accepted, Please Reupload a Different Image";
+                    document.getElementById("submit-button").disabled = true;
+                }
+            })
+            .catch(error => {
+                hideOverlay();
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
